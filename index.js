@@ -11,17 +11,28 @@ app.get("/", function(req, res){
   res.sendFile(__dirname + "/index.html");
 });
 
+// CONVERTOR CODE
 app.post("/", function(req, res){
   var crypto = req.body.crypto;
   var fiat = req.body.fiat;
-  var url = "https://apiv2.bitcoinaverage.com/indices/global/ticker/" + crypto + fiat;
-  request(url, function(error, response, body){
-  var data = JSON.parse(body);
-  var price = data.last;
-  var date = data.display_timestamp;
-  res.write("<p>Current date: " + date + "</p>");
-  res.write("<h2>The price of 1 " + crypto + " is " + price + " " + fiat + "</h2>");
-  res.send();
+  var amountToConvert = req.body.amount;
+  var options = {
+    url: "https://apiv2.bitcoinaverage.com/convert/global",
+    method: "GET",
+    qs: {
+      from: crypto,
+      to: fiat,
+      amount: amountToConvert
+    }
+  };
+  
+  request(options, function(error, response, body){
+    var data = JSON.parse(body);
+    var conversionTime = data.time;
+    var convertedAmount = data.price;
+    res.write("<p>At the time: " + conversionTime + "</p>");
+    res.write("<p>" + amountToConvert + " " + crypto + " is worth " + convertedAmount + " " + fiat + "</p>");
+    res.send();
   });
 });
 
