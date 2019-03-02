@@ -2,10 +2,12 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const path = require('path');
 const request = require("request");
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/", function(req, res){
   res.sendFile(__dirname + "/index.html");
@@ -25,7 +27,7 @@ app.post("/", function(req, res){
       amount: amountToConvert
     }
   };
-  
+
   request(options, function(error, response, body){
     var data = JSON.parse(body);
     var conversionTime = data.time;
